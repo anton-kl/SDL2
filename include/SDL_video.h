@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@
  *  Header file for SDL video functions.
  */
 
-#ifndef _SDL_video_h
-#define _SDL_video_h
+#ifndef SDL_video_h_
+#define SDL_video_h_
 
 #include "SDL_stdinc.h"
 #include "SDL_pixels.h"
@@ -1213,6 +1213,6 @@ extern DECLSPEC void SDLCALL SDL_GL_DeleteContext(SDL_GLContext context);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_video_h */
+#endif /* SDL_video_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

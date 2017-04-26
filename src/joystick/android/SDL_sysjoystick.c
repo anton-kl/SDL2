@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -167,7 +167,7 @@ keycode_to_SDL(int keycode)
             
         default:
             return -1;
-            break;
+            /* break; -Wunreachable-code-break */
     }
     
     /* This is here in case future generations, probably with six fingers per hand, 
@@ -363,12 +363,14 @@ SDL_SYS_JoystickInit(void)
 
 }
 
-int SDL_SYS_NumJoysticks()
+int
+SDL_SYS_NumJoysticks(void)
 {
     return numjoysticks;
 }
 
-void SDL_SYS_JoystickDetect()
+void
+SDL_SYS_JoystickDetect(void)
 {
     /* Support for device connect/disconnect is API >= 16 only,
      * so we poll every three seconds

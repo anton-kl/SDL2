@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,8 +36,8 @@
  *  to how they would like the library to work.
  */
 
-#ifndef _SDL_hints_h
-#define _SDL_hints_h
+#ifndef SDL_hints_h_
+#define SDL_hints_h_
 
 #include "SDL_stdinc.h"
 
@@ -233,6 +233,16 @@ extern "C" {
 #define SDL_HINT_GRAB_KEYBOARD              "SDL_GRAB_KEYBOARD"
 
 /**
+ *  \brief  A variable setting the speed scale for mouse motion, in floating point, when the mouse is not in relative mode
+ */
+#define SDL_HINT_MOUSE_NORMAL_SPEED_SCALE    "SDL_MOUSE_NORMAL_SPEED_SCALE"
+
+/**
+ *  \brief  A variable setting the scale for mouse motion, in floating point, when the mouse is in relative mode
+ */
+#define SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE    "SDL_MOUSE_RELATIVE_SPEED_SCALE"
+
+/**
  *  \brief  A variable controlling whether relative mouse mode is implemented using mouse warping
  *
  *  This variable can be set to the following values:
@@ -401,6 +411,33 @@ extern "C" {
 #define SDL_HINT_TIMER_RESOLUTION "SDL_TIMER_RESOLUTION"
 
 
+/**
+ *  \brief  A variable describing the content orientation on QtWayland-based platforms.
+ *
+ *  On QtWayland platforms, windows are rotated client-side to allow for custom
+ *  transitions. In order to correctly position overlays (e.g. volume bar) and
+ *  gestures (e.g. events view, close/minimize gestures), the system needs to
+ *  know in which orientation the application is currently drawing its contents.
+ *
+ *  This does not cause the window to be rotated or resized, the application
+ *  needs to take care of drawing the content in the right orientation (the
+ *  framebuffer is always in portrait mode).
+ *
+ *  This variable can be one of the following values:
+ *    "primary" (default), "portrait", "landscape", "inverted-portrait", "inverted-landscape"
+ */
+#define SDL_HINT_QTWAYLAND_CONTENT_ORIENTATION "SDL_QTWAYLAND_CONTENT_ORIENTATION"
+
+/**
+ *  \brief  Flags to set on QtWayland windows to integrate with the native window manager.
+ *
+ *  On QtWayland platforms, this hint controls the flags to set on the windows.
+ *  For example, on Sailfish OS "OverridesSystemGestures" disables swipe gestures.
+ *
+ *  This variable is a space-separated list of the following values (empty = no flags):
+ *    "OverridesSystemGestures", "StaysOnTop", "BypassWindowManager"
+ */
+#define SDL_HINT_QTWAYLAND_WINDOW_FLAGS "SDL_QTWAYLAND_WINDOW_FLAGS"
 
 /**
 *  \brief  A string specifying SDL's threads stack size in bytes or "0" for the backend's default size
@@ -708,6 +745,63 @@ extern "C" {
 #define SDL_HINT_RPI_VIDEO_LAYER           "SDL_RPI_VIDEO_LAYER"
 
 /**
+ *  \brief  A variable controlling what driver to use for OpenGL ES contexts.
+ *
+ *  On some platforms, currently Windows and X11, OpenGL drivers may support
+ *  creating contexts with an OpenGL ES profile. By default SDL uses these
+ *  profiles, when available, otherwise it attempts to load an OpenGL ES
+ *  library, e.g. that provided by the ANGLE project. This variable controls
+ *  whether SDL follows this default behaviour or will always load an
+ *  OpenGL ES library.
+ *
+ *  Circumstances where this is useful include
+ *  - Testing an app with a particular OpenGL ES implementation, e.g ANGLE,
+ *    or emulator, e.g. those from ARM, Imagination or Qualcomm.
+ *  - Resolving OpenGL ES function addresses at link time by linking with
+ *    the OpenGL ES library instead of querying them at run time with
+ *    SDL_GL_GetProcAddress().
+ *
+ *  Caution: for an application to work with the default behaviour across
+ *  different OpenGL drivers it must query the OpenGL ES function
+ *  addresses at run time using SDL_GL_GetProcAddress().
+ *
+ *  This variable is ignored on most platforms because OpenGL ES is native
+ *  or not supported.
+ *
+ *  This variable can be set to the following values:
+ *    "0"       - Use ES profile of OpenGL, if available. (Default when not set.)
+ *    "1"       - Load OpenGL ES library using the default library names.
+ *
+ */
+#define SDL_HINT_OPENGL_ES_DRIVER   "SDL_OPENGL_ES_DRIVER"
+
+/**
+ *  \brief  A variable controlling speed/quality tradeoff of audio resampling.
+ *
+ *  If available, SDL can use libsamplerate ( http://www.mega-nerd.com/SRC/ )
+ *  to handle audio resampling. There are different resampling modes available
+ *  that produce different levels of quality, using more CPU.
+ *
+ *  If this hint isn't specified to a valid setting, or libsamplerate isn't
+ *  available, SDL will use the default, internal resampling algorithm.
+ *
+ *  Note that this is currently only applicable to resampling audio that is
+ *  being written to a device for playback or audio being read from a device
+ *  for capture. SDL_AudioCVT always uses the default resampler (although this
+ *  might change for SDL 2.1).
+ *
+ *  This hint is currently only checked at audio subsystem initialization.
+ *
+ *  This variable can be set to the following values:
+ *
+ *    "0" or "default" - Use SDL's internal resampling (Default when not set - low quality, fast)
+ *    "1" or "fast"    - Use fast, slightly higher quality resampling, if available
+ *    "2" or "medium"  - Use medium quality resampling, if available
+ *    "3" or "best"    - Use high quality resampling, if available
+ */
+#define SDL_HINT_AUDIO_RESAMPLING_MODE   "SDL_AUDIO_RESAMPLING_MODE"
+
+/**
  *  \brief  An enumeration of hint priorities
  */
 typedef enum
@@ -754,13 +848,17 @@ extern DECLSPEC const char * SDLCALL SDL_GetHint(const char *name);
 extern DECLSPEC SDL_bool SDLCALL SDL_GetHintBoolean(const char *name, SDL_bool default_value);
 
 /**
+ * \brief type definition of the hint callback function.
+ */
+typedef void (*SDL_HintCallback)(void *userdata, const char *name, const char *oldValue, const char *newValue);
+
+/**
  *  \brief Add a function to watch a particular hint
  *
  *  \param name The hint to watch
  *  \param callback The function to call when the hint value changes
  *  \param userdata A pointer to pass to the callback function
  */
-typedef void (*SDL_HintCallback)(void *userdata, const char *name, const char *oldValue, const char *newValue);
 extern DECLSPEC void SDLCALL SDL_AddHintCallback(const char *name,
                                                  SDL_HintCallback callback,
                                                  void *userdata);
@@ -790,6 +888,6 @@ extern DECLSPEC void SDLCALL SDL_ClearHints(void);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_hints_h */
+#endif /* SDL_hints_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

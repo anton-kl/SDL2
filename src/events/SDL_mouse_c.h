@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../SDL_internal.h"
 
-#ifndef _SDL_mouse_c_h
-#define _SDL_mouse_c_h
+#ifndef SDL_mouse_c_h_
+#define SDL_mouse_c_h_
 
 #include "SDL_mouse.h"
 
@@ -83,6 +83,10 @@ typedef struct
     Uint32 buttonstate;
     SDL_bool relative_mode;
     SDL_bool relative_mode_warp;
+    float normal_speed_scale;
+    float relative_speed_scale;
+    float scale_accum_x;
+    float scale_accum_y;
 
     /* Data for double-click tracking */
     int num_clickstates;
@@ -128,6 +132,6 @@ extern int SDL_SendMouseWheel(SDL_Window * window, SDL_MouseID mouseID, int x, i
 /* Shutdown the mouse subsystem */
 extern void SDL_MouseQuit(void);
 
-#endif /* _SDL_mouse_c_h */
+#endif /* SDL_mouse_c_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */
